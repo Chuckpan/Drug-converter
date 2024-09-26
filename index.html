@@ -94,7 +94,7 @@
     <div class="container">
         <div class="conversion-info">
             換算關係：<br>
-            Recormon or Eprex 5000 IU/week ≈ Nesp 20 mcg/week ≈ Vafseo 300*7 mg/week ≈ <span class="nowrap">Vafseo 300 mg/day</span>
+            Recormon or Eprex 5000 IU/week = Nesp 20 mcg/week = Vafseo 300*7 mg/week = <span class="nowrap">Vafseo 300 mg/day</span>
         </div>
         <form method="post">
             <div>
@@ -118,7 +118,6 @@
             $dose = floatval($_POST['dose']);
             $recormon = $nesp = $vafseo_week = $vafseo_day = 0;
 
-            // 計算公式保持不變
             switch($drug) {
                 case 'recormon':
                     $recormon = $dose;
