@@ -78,6 +78,15 @@
             color: var(--primary-color);
             margin-top: 0;
         }
+        .info-text {
+            margin-top: 20px;
+            font-size: 16px;
+            color: var(--text-color);
+            background-color: var(--secondary-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid #e0e0e0;
+        }
     </style>
 </head>
 <body>
@@ -85,66 +94,73 @@
     <div class="container">
         <div class="conversion-info">
             換算關係：<br>
-            Recormon or Eprex 5000 IU/week = Nesp 20 mcg/week = Vafseo 300*7 mg/week = <span class="nowrap">Vafseo 300 mg/day</span>
+            Recormon or Eprex 5000 IU/week ≈ Nesp 20 mcg/week ≈ Vafseo 300*7 mg/week ≈ <span class="nowrap">Vafseo 300 mg/day</span>
         </div>
-        <div>
-            <label for="drug">選擇藥物：</label>
-            <select id="drug">
-                <option value="recormon">Recormon or Eprex (IU/week)</option>
-                <option value="nesp">Nesp (mcg/week)</option>
-                <option value="vafseo_week">Vafseo (mg/week)</option>
-                <option value="vafseo_day">Vafseo (mg/day)</option>
-            </select>
-        </div>
-        <div>
-            <label for="dose">輸入劑量：</label>
-            <input type="number" id="dose">
-        </div>
-        <button onclick="convert()">換算</button>
-        <div id="result"></div>
-    </div>
+        <form method="post">
+            <div>
+                <label for="drug">選擇藥物：</label>
+                <select id="drug" name="drug">
+                    <option value="recormon">Recormon or Eprex (IU/week)</option>
+                    <option value="nesp">Nesp (mcg/week)</option>
+                    <option value="vafseo_week">Vafseo (mg/week)</option>
+                    <option value="vafseo_day">Vafseo (mg/day)</option>
+                </select>
+            </div>
+            <div>
+                <label for="dose">輸入劑量：</label>
+                <input type="number" id="dose" name="dose" step="0.01" required>
+            </div>
+            <button type="submit" name="convert">換算</button>
+        </form>
+        <?php
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['convert'])) {
+            $drug = $_POST['drug'];
+            $dose = floatval($_POST['dose']);
+            $recormon = $nesp = $vafseo_week = $vafseo_day = 0;
 
-    <script>
-        function convert() {
-            const drug = document.getElementById('drug').value;
-            const dose = parseFloat(document.getElementById('dose').value);
-            let recormon, nesp, vafseo_week, vafseo_day;
-
-            switch(drug) {
+            switch($drug) {
                 case 'recormon':
-                    recormon = dose;
-                    nesp = dose / 200;
-                    vafseo_week = dose * 0.525;
-                    vafseo_day = dose * 0.075;
+                    $recormon = $dose;
+                    $nesp = $dose / 250;
+                    $vafseo_week = $dose * 0.42;
+                    $vafseo_day = $dose * 0.06;
                     break;
                 case 'nesp':
-                    recormon = dose * 200;
-                    nesp = dose;
-                    vafseo_week = dose * 105;
-                    vafseo_day = dose * 15;
+                    $recormon = $dose * 250;
+                    $nesp = $dose;
+                    $vafseo_week = $dose * 105;
+                    $vafseo_day = $dose * 15;
                     break;
                 case 'vafseo_week':
-                    recormon = dose / 0.525;
-                    nesp = dose / 105;
-                    vafseo_week = dose;
-                    vafseo_day = dose / 7;
+                    $recormon = $dose / 0.42;
+                    $nesp = $dose / 105;
+                    $vafseo_week = $dose;
+                    $vafseo_day = $dose / 7;
                     break;
                 case 'vafseo_day':
-                    recormon = dose / 0.075;
-                    nesp = dose / 15;
-                    vafseo_week = dose * 7;
-                    vafseo_day = dose;
+                    $recormon = $dose / 0.06;
+                    $nesp = $dose / 15;
+                    $vafseo_week = $dose * 7;
+                    $vafseo_day = $dose;
                     break;
             }
 
-            document.getElementById('result').innerHTML = `
+            echo "
+            <div id='result'>
                 <h2>換算結果：</h2>
-                <p>Recormon or Eprex: ${recormon.toFixed(2)} IU/week</p>
-                <p>Nesp: ${nesp.toFixed(2)} mcg/week</p>
-                <p>Vafseo: ${vafseo_week.toFixed(2)} mg/week</p>
-                <p>Vafseo: ${vafseo_day.toFixed(2)} mg/day</p>
-            `;
+                <p>Recormon or Eprex: " . number_format($recormon, 2) . " IU/week</p>
+                <p>Nesp: " . number_format($nesp, 2) . " mcg/week</p>
+                <p>Vafseo: " . number_format($vafseo_week, 2) . " mg/week</p>
+                <p>Vafseo: " . number_format($vafseo_day, 2) . " mg/day</p>
+            </div>
+            ";
         }
-    </script>
+        ?>
+    </div>
+
+    <div class="info-text">
+        Vafseo 仿單建議(衛部藥輸字 第 028478 號、第 028477 號):<br>
+        成人劑量的起始劑量為每日⼀次⼝服 300 毫克 vadadustat。之後可依據病人的情況調整劑量，劑量調整應在每日 150 毫克至每日最大建議劑量 600 毫克的範圍內，以 150 毫克增幅進行，以達到或維持 10 到 12 g/dL 的血紅素濃度。
+    </div>
 </body>
 </html>
